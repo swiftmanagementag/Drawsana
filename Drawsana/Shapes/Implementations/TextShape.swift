@@ -11,7 +11,7 @@ import UIKit
 
 public class TextShape: Shape, ShapeSelectable {
   private enum CodingKeys: String, CodingKey {
-    case id, transform, text, fontName, fontSize, fillColor, type, explicitWidth
+    case id, transform, text, fontName, fontSize, fillColor, type, explicitWidth, boundingRect
   }
 
   public static let type = "Text"
@@ -54,8 +54,10 @@ public class TextShape: Shape, ShapeSelectable {
     fontName = try values.decode(String.self, forKey: .fontName)
     fontSize = try values.decode(CGFloat.self, forKey: .fontSize)
     fillColor = UIColor(hexString: try values.decode(String.self, forKey: .fillColor))
+	boundingRect = try values.decode(CGRect.self, forKey: .boundingRect)
     explicitWidth = try values.decodeIfPresent(CGFloat.self, forKey: .explicitWidth)
     transform = try values.decode(ShapeTransform.self, forKey: .transform)
+	
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -66,6 +68,7 @@ public class TextShape: Shape, ShapeSelectable {
     try container.encode(fontName, forKey: .fontName)
     try container.encode(fillColor.hexString, forKey: .fillColor)
     try container.encode(fontSize, forKey: .fontSize)
+	try container.encode(boundingRect, forKey: .boundingRect)
     try container.encodeIfPresent(explicitWidth, forKey: .explicitWidth)
     try container.encode(transform, forKey: .transform)
   }

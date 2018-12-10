@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class TextShapeEditingView: UIView {
+public class StampShapeEditingView: UIView {
   /// Upper left 'delete' button for text. You may add any subviews you want,
   /// set border & background color, etc.
   public let deleteControlView = UIView()
@@ -17,15 +17,15 @@ public class TextShapeEditingView: UIView {
   public let resizeAndRotateControlView = UIView()
   /// Right side handle to change width of text. You may add any subviews you
   /// want, set border & background color, etc.
-  public let changeWidthControlView = UIView()
+  public let changeImageControlView = UIView()
 
   /// The `UITextView` that the user interacts with during editing
-  public let textView: UITextView
+  public let imageView: UIImageView
 
   public enum DragActionType {
     case delete
     case resizeAndRotate
-    case changeWidth
+    case changeImage
   }
 
   public struct Control {
@@ -35,15 +35,15 @@ public class TextShapeEditingView: UIView {
 
   public private(set) var controls = [Control]()
 
-  init(textView: UITextView) {
-    self.textView = textView
+  init(imageView: UIImageView) {
+    self.imageView = imageView
     super.init(frame: .zero)
 
     clipsToBounds = false
     backgroundColor = .clear
     layer.isOpaque = false
 
-    textView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.translatesAutoresizingMaskIntoConstraints = false
 
     deleteControlView.translatesAutoresizingMaskIntoConstraints = false
     deleteControlView.backgroundColor = .red
@@ -51,16 +51,16 @@ public class TextShapeEditingView: UIView {
     resizeAndRotateControlView.translatesAutoresizingMaskIntoConstraints = false
     resizeAndRotateControlView.backgroundColor = .green
 
-    changeWidthControlView.translatesAutoresizingMaskIntoConstraints = false
-    changeWidthControlView.backgroundColor = .yellow
+    changeImageControlView.translatesAutoresizingMaskIntoConstraints = false
+    changeImageControlView.backgroundColor = .yellow
 
-    addSubview(textView)
+    addSubview(imageView)
 
     NSLayoutConstraint.activate([
-      textView.leftAnchor.constraint(equalTo: leftAnchor),
-      textView.rightAnchor.constraint(equalTo: rightAnchor),
-      textView.topAnchor.constraint(equalTo: topAnchor),
-      textView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      imageView.leftAnchor.constraint(equalTo: leftAnchor),
+      imageView.rightAnchor.constraint(equalTo: rightAnchor),
+      imageView.topAnchor.constraint(equalTo: topAnchor),
+      imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
     ])
   }
 
@@ -69,52 +69,42 @@ public class TextShapeEditingView: UIView {
   }
 
   override public func sizeThatFits(_ size: CGSize) -> CGSize {
-    return textView.sizeThatFits(size)
-  }
-
-  @discardableResult
-  override public func becomeFirstResponder() -> Bool {
-    return textView.becomeFirstResponder()
-  }
-
-  @discardableResult
-  override public func resignFirstResponder() -> Bool {
-    return textView.resignFirstResponder()
+    return imageView.sizeThatFits(size)
   }
 
   public func addStandardControls() {
-    addControl(dragActionType: .delete, view: deleteControlView) { (textView, deleteControlView) in
+    addControl(dragActionType: .delete, view: deleteControlView) { (imageView, deleteControlView) in
       NSLayoutConstraint.activate(deprioritize([
         deleteControlView.widthAnchor.constraint(equalToConstant: 36),
         deleteControlView.heightAnchor.constraint(equalToConstant: 36),
-        deleteControlView.rightAnchor.constraint(equalTo: textView.leftAnchor),
-        deleteControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -3),
+        deleteControlView.rightAnchor.constraint(equalTo: imageView.leftAnchor),
+        deleteControlView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -3),
       ]))
     }
 
-    addControl(dragActionType: .resizeAndRotate, view: resizeAndRotateControlView) { (textView, resizeAndRotateControlView) in
+    addControl(dragActionType: .resizeAndRotate, view: resizeAndRotateControlView) { (imageView, resizeAndRotateControlView) in
       NSLayoutConstraint.activate(deprioritize([
         resizeAndRotateControlView.widthAnchor.constraint(equalToConstant: 36),
         resizeAndRotateControlView.heightAnchor.constraint(equalToConstant: 36),
-        resizeAndRotateControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: 5),
-        resizeAndRotateControlView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 4),
+        resizeAndRotateControlView.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 5),
+        resizeAndRotateControlView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
       ]))
     }
 
-    addControl(dragActionType: .changeWidth, view: changeWidthControlView) { (textView, changeWidthControlView) in
+    addControl(dragActionType: .changeImage, view: changeImageControlView) { (imageView, changeWidthControlView) in
       NSLayoutConstraint.activate(deprioritize([
         changeWidthControlView.widthAnchor.constraint(equalToConstant: 36),
         changeWidthControlView.heightAnchor.constraint(equalToConstant: 36),
-        changeWidthControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: 5),
-        changeWidthControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -4),
+        changeWidthControlView.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 5),
+        changeWidthControlView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -4),
       ]))
     }
   }
 
-  public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UITextView, T) -> Void) {
+  public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UIImageView, T) -> Void) {
     addSubview(view)
     controls.append(Control(view: view, dragActionType: dragActionType))
-    applyConstraints(textView, view)
+    applyConstraints(imageView, view)
   }
 
   public func getDragActionType(point: CGPoint) -> DragActionType? {
