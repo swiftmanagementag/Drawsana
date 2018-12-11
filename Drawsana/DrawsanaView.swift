@@ -352,15 +352,19 @@ public class DrawsanaView: UIView {
      to add `offset` from above with `shape.transform.translation` to arrive
      at the right final translation.
      */
+	
+	// figure out where the shape is in space
+	let translation = shape.transform.translation + CGPoint(x:  0, y: -selectionBounds.size.height)
+	
+	let translation2 = (offset + shape.transform.translation +
+		// Account for the coordinate system being anchored in the middle
+		CGPoint(x: -bounds.size.width / 2, y: -bounds.size.height / 2) +
+		// We've just moved the CENTER of the selection view to the UPPER LEFT
+		// of the shape, so adjust by half the selection size:
+		CGPoint(x: selectionBounds.size.width / 2, y: selectionBounds.size.height / 2))
+	
     selectionIndicatorView.transform = ShapeTransform(
-      translation: (
-        // figure out where the shape is in space
-        offset + shape.transform.translation +
-        // Account for the coordinate system being anchored in the middle
-        CGPoint(x: -bounds.size.width / 2, y: -bounds.size.height / 2) +
-        // We've just moved the CENTER of the selection view to the UPPER LEFT
-        // of the shape, so adjust by half the selection size:
-        CGPoint(x: selectionBounds.size.width / 2, y: selectionBounds.size.height / 2)),
+      translation: translation,
       rotation: shape.transform.rotation,
       scale: shape.transform.scale).affineTransform
     selectionIndicatorView.isHidden = false

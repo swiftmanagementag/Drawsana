@@ -1,5 +1,5 @@
 //
-//  TextShapeEditingView.swift
+//  StampShapeEditingView.swift
 //  Drawsana
 //
 //  Created by Steve Landey on 8/8/18.
@@ -19,9 +19,6 @@ public class StampShapeEditingView: UIView {
   /// want, set border & background color, etc.
   public let changeImageControlView = UIView()
 
-  /// The `UITextView` that the user interacts with during editing
-  public let imageView: UIImageView
-
   public enum DragActionType {
     case delete
     case resizeAndRotate
@@ -35,17 +32,16 @@ public class StampShapeEditingView: UIView {
 
   public private(set) var controls = [Control]()
 
-  init(imageView: UIImageView) {
-    self.imageView = imageView
-    super.init(frame: .zero)
+  init() {
+	super.init(frame: .zero)
 
-    clipsToBounds = false
-    backgroundColor = .clear
+	clipsToBounds = false
+    backgroundColor = UIColor.clear
+	layer.borderColor = UIColor.red.cgColor
+	layer.borderWidth = 2.0
     layer.isOpaque = false
-
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-
-    deleteControlView.translatesAutoresizingMaskIntoConstraints = false
+	
+	deleteControlView.translatesAutoresizingMaskIntoConstraints = false
     deleteControlView.backgroundColor = .red
 
     resizeAndRotateControlView.translatesAutoresizingMaskIntoConstraints = false
@@ -53,32 +49,23 @@ public class StampShapeEditingView: UIView {
 
     changeImageControlView.translatesAutoresizingMaskIntoConstraints = false
     changeImageControlView.backgroundColor = .yellow
-
-    addSubview(imageView)
-
-    NSLayoutConstraint.activate([
-      imageView.leftAnchor.constraint(equalTo: leftAnchor),
-      imageView.rightAnchor.constraint(equalTo: rightAnchor),
-      imageView.topAnchor.constraint(equalTo: topAnchor),
-      imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-    ])
   }
 
   required public init?(coder aDecoder: NSCoder) {
     fatalError()
   }
-
+/*
   override public func sizeThatFits(_ size: CGSize) -> CGSize {
     return imageView.sizeThatFits(size)
   }
-
+*/
   public func addStandardControls() {
     addControl(dragActionType: .delete, view: deleteControlView) { (imageView, deleteControlView) in
       NSLayoutConstraint.activate(deprioritize([
         deleteControlView.widthAnchor.constraint(equalToConstant: 36),
         deleteControlView.heightAnchor.constraint(equalToConstant: 36),
-        deleteControlView.rightAnchor.constraint(equalTo: imageView.leftAnchor),
-        deleteControlView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -3),
+        deleteControlView.rightAnchor.constraint(equalTo: self.leftAnchor),
+        deleteControlView.bottomAnchor.constraint(equalTo: self.topAnchor, constant: -3),
       ]))
     }
 
@@ -86,25 +73,26 @@ public class StampShapeEditingView: UIView {
       NSLayoutConstraint.activate(deprioritize([
         resizeAndRotateControlView.widthAnchor.constraint(equalToConstant: 36),
         resizeAndRotateControlView.heightAnchor.constraint(equalToConstant: 36),
-        resizeAndRotateControlView.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 5),
-        resizeAndRotateControlView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
+        resizeAndRotateControlView.leftAnchor.constraint(equalTo: self.rightAnchor, constant: 5),
+        resizeAndRotateControlView.topAnchor.constraint(equalTo: self.bottomAnchor, constant: 4),
       ]))
     }
 
-    addControl(dragActionType: .changeImage, view: changeImageControlView) { (imageView, changeWidthControlView) in
-      NSLayoutConstraint.activate(deprioritize([
-        changeWidthControlView.widthAnchor.constraint(equalToConstant: 36),
-        changeWidthControlView.heightAnchor.constraint(equalToConstant: 36),
-        changeWidthControlView.leftAnchor.constraint(equalTo: imageView.rightAnchor, constant: 5),
-        changeWidthControlView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -4),
-      ]))
-    }
+	let x = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	x.text = "X"
+	x.textAlignment = .center
+	deleteControlView.addSubview(x)
+	
+	let o = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	o.text = "O"
+	o.textAlignment = .center
+	resizeAndRotateControlView.addSubview(o)
+	
   }
 
   public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UIImageView, T) -> Void) {
     addSubview(view)
     controls.append(Control(view: view, dragActionType: dragActionType))
-    applyConstraints(imageView, view)
   }
 
   public func getDragActionType(point: CGPoint) -> DragActionType? {
@@ -120,7 +108,7 @@ public class StampShapeEditingView: UIView {
 
 private func deprioritize(_ constraints: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
   for constraint in constraints {
-    constraint.priority = .defaultLow
+   constraint.priority = .defaultLow
   }
   return constraints
 }

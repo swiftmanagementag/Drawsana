@@ -54,18 +54,27 @@ public class StampShape: Shape, ShapeSelectable {
   }
 
   public func render(in context: CGContext) {
-    if isBeingEdited { return }
+    //if isBeingEdited { return }
     transform.begin(context: context)
 	if let image = UIImage(named: self.imageName) {
+		let origin = boundingRect.origin
+		var size =  self.boundingRect.size
+		let imageSize = image.size
+		
+		if imageSize.width > imageSize.height {
+			size.height = size.height * (imageSize.height / imageSize.width)
+		} else {
+			size.width = size.width * (imageSize.width / imageSize.height)
+		}
+		
 		image.draw(
-			in: CGRect(origin: CGPoint.zero, size: self.boundingRect.size),
+			in: CGRect(origin: origin, size: size),
 			blendMode: .normal,
 			alpha: 1.0
 		)
 	}
     transform.end(context: context)
   }
-
   public func apply(userSettings: UserSettings) {
   }
 }

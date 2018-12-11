@@ -109,6 +109,21 @@ public class TextShapeEditingView: UIView {
         changeWidthControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -4),
       ]))
     }
+	let x = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	x.text = "X"
+	x.textAlignment = .center
+	deleteControlView.addSubview(x)
+	
+	let o = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	o.text = "O"
+	o.textAlignment = .center
+	resizeAndRotateControlView.addSubview(o)
+	
+	let h = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	h.text = "H"
+	h.textAlignment = .center
+	changeWidthControlView.addSubview(h)
+
   }
 
   public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UITextView, T) -> Void) {
