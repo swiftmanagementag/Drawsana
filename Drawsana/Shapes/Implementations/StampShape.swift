@@ -57,15 +57,8 @@ public class StampShape: Shape, ShapeSelectable {
     //if isBeingEdited { return }
     transform.begin(context: context)
 	if let image = UIImage(named: self.imageName) {
-		let origin = boundingRect.origin
+		let origin = self.boundingRect.origin
 		var size =  self.boundingRect.size
-		let imageSize = image.size
-		
-		if imageSize.width > imageSize.height {
-			size.height = size.height * (imageSize.height / imageSize.width)
-		} else {
-			size.width = size.width * (imageSize.width / imageSize.height)
-		}
 		
 		image.draw(
 			in: CGRect(origin: origin, size: size),
@@ -76,5 +69,6 @@ public class StampShape: Shape, ShapeSelectable {
     transform.end(context: context)
   }
   public func apply(userSettings: UserSettings) {
+	imageName = userSettings.imageName
   }
 }

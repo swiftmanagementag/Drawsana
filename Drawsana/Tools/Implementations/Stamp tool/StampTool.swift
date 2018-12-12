@@ -110,8 +110,12 @@ public class StampTool: NSObject, DrawingTool {
 		} else {
 			let newShape = StampShape()
 			newShape.apply(userSettings: context.userSettings)
-			newShape.boundingRect = CGRect(origin: point, size: CGSize(width: 100, height: 100))
+			
 			self.selectedShape = newShape
+			// point
+			newShape.boundingRect = self.computeBounds()
+			
+			//let newPoint = point - CGPoint(x: newShape.boundingRect.height, y: newShape.boundingRect.width / 2)
 			newShape.transform.translation = delegate?.stampToolPointForNewStamp(tappedPoint: point) ?? point
 			
 			beginEditing(shape: newShape, context: context)
@@ -236,11 +240,20 @@ public class StampTool: NSObject, DrawingTool {
 	}
 	func computeBounds() -> CGRect {
 		guard let shape = selectedShape else { return .zero }
-		updateImageView()
 		
 		let origin = CGPoint.zero
-		var rect = CGRect(origin: origin, size: CGSize(width: 100,height: 100))
+		var size = CGSize(width: 100, height:100)
 		
+		if let image = UIImage(named: shape.imageName) {
+			let imageSize = image.size
+			
+			if imageSize.width > imageSize.height {
+				size.height = size.width * (imageSize.height / imageSize.width)
+			} else {
+				size.width = size.height * (imageSize.width / imageSize.height)
+			}
+		}
+		let rect = CGRect(origin: origin, size:size)
 		return rect
 	}
 

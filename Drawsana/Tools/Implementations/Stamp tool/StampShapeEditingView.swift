@@ -60,21 +60,21 @@ public class StampShapeEditingView: UIView {
   }
 */
   public func addStandardControls() {
-    addControl(dragActionType: .delete, view: deleteControlView) { (imageView, deleteControlView) in
+    addControl(dragActionType: .delete, view: deleteControlView) { (containerView, deleteControlView) in
       NSLayoutConstraint.activate(deprioritize([
         deleteControlView.widthAnchor.constraint(equalToConstant: 36),
         deleteControlView.heightAnchor.constraint(equalToConstant: 36),
-        deleteControlView.rightAnchor.constraint(equalTo: self.leftAnchor),
-        deleteControlView.bottomAnchor.constraint(equalTo: self.topAnchor, constant: -3),
+        deleteControlView.rightAnchor.constraint(equalTo: containerView.leftAnchor),
+        deleteControlView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -3),
       ]))
     }
 
-    addControl(dragActionType: .resizeAndRotate, view: resizeAndRotateControlView) { (imageView, resizeAndRotateControlView) in
+    addControl(dragActionType: .resizeAndRotate, view: resizeAndRotateControlView) { (containerView, resizeAndRotateControlView) in
       NSLayoutConstraint.activate(deprioritize([
         resizeAndRotateControlView.widthAnchor.constraint(equalToConstant: 36),
         resizeAndRotateControlView.heightAnchor.constraint(equalToConstant: 36),
-        resizeAndRotateControlView.leftAnchor.constraint(equalTo: self.rightAnchor, constant: 5),
-        resizeAndRotateControlView.topAnchor.constraint(equalTo: self.bottomAnchor, constant: 4),
+        resizeAndRotateControlView.leftAnchor.constraint(equalTo: containerView.rightAnchor, constant: 5),
+        resizeAndRotateControlView.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 4),
       ]))
     }
 
@@ -90,9 +90,11 @@ public class StampShapeEditingView: UIView {
 	
   }
 
-  public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UIImageView, T) -> Void) {
+  public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UIView, T) -> Void) {
     addSubview(view)
     controls.append(Control(view: view, dragActionType: dragActionType))
+	
+	applyConstraints(self, view)
   }
 
   public func getDragActionType(point: CGPoint) -> DragActionType? {
