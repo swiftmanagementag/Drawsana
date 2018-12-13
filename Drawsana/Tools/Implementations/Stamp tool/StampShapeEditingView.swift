@@ -37,57 +37,66 @@ public class StampShapeEditingView: UIView {
 
 	clipsToBounds = false
     backgroundColor = UIColor.clear
-	layer.borderColor = UIColor.red.cgColor
-	layer.borderWidth = 2.0
+	layer.borderColor = UIColor.lightGray.cgColor
+	layer.borderWidth = 1.0
     layer.isOpaque = false
 	
-	deleteControlView.translatesAutoresizingMaskIntoConstraints = false
-    deleteControlView.backgroundColor = .red
-
-    resizeAndRotateControlView.translatesAutoresizingMaskIntoConstraints = false
-    resizeAndRotateControlView.backgroundColor = .green
-
-    changeImageControlView.translatesAutoresizingMaskIntoConstraints = false
-    changeImageControlView.backgroundColor = .yellow
+	for v in [deleteControlView, resizeAndRotateControlView, changeImageControlView] {
+		v.translatesAutoresizingMaskIntoConstraints = false
+		v.backgroundColor = UIColor.lightGray.withAlphaComponent(0.8)
+		v.layer.cornerRadius = 4
+		v.layer.masksToBounds = true
+	}
   }
 
   required public init?(coder aDecoder: NSCoder) {
     fatalError()
   }
-/*
-  override public func sizeThatFits(_ size: CGSize) -> CGSize {
-    return imageView.sizeThatFits(size)
-  }
-*/
-  public func addStandardControls() {
+
+public func addStandardControls() {
     addControl(dragActionType: .delete, view: deleteControlView) { (containerView, deleteControlView) in
       NSLayoutConstraint.activate(deprioritize([
         deleteControlView.widthAnchor.constraint(equalToConstant: 36),
         deleteControlView.heightAnchor.constraint(equalToConstant: 36),
-        deleteControlView.rightAnchor.constraint(equalTo: containerView.leftAnchor),
-        deleteControlView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -3),
+		deleteControlView.rightAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0),
+        deleteControlView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: 0),
       ]))
     }
+
+	addControl(dragActionType: .changeImage, view: changeImageControlView) { (containerView, changeImageControlView) in
+		NSLayoutConstraint.activate(deprioritize([
+			changeImageControlView.widthAnchor.constraint(equalToConstant: 36),
+			changeImageControlView.heightAnchor.constraint(equalToConstant: 36),
+			changeImageControlView.leftAnchor.constraint(equalTo: containerView.rightAnchor, constant:0),
+			changeImageControlView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant:0),
+			]))
+	}
 
     addControl(dragActionType: .resizeAndRotate, view: resizeAndRotateControlView) { (containerView, resizeAndRotateControlView) in
       NSLayoutConstraint.activate(deprioritize([
         resizeAndRotateControlView.widthAnchor.constraint(equalToConstant: 36),
         resizeAndRotateControlView.heightAnchor.constraint(equalToConstant: 36),
-        resizeAndRotateControlView.leftAnchor.constraint(equalTo: containerView.rightAnchor, constant: 5),
-        resizeAndRotateControlView.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 4),
+        resizeAndRotateControlView.leftAnchor.constraint(equalTo: containerView.rightAnchor, constant:0),
+        resizeAndRotateControlView.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant:0),
       ]))
     }
 
 	let x = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
-	x.text = "X"
+	x.text = "🗑️"
 	x.textAlignment = .center
 	deleteControlView.addSubview(x)
 	
 	let o = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
-	o.text = "O"
+	o.text = "🌀"
 	o.textAlignment = .center
 	resizeAndRotateControlView.addSubview(o)
+
+	let i = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	i.text = "📷"
+	i.textAlignment = .center
+	changeImageControlView.addSubview(i)
 	
+
   }
 
   public func addControl<T: UIView>(dragActionType: DragActionType, view: T, applyConstraints: (UIView, T) -> Void) {

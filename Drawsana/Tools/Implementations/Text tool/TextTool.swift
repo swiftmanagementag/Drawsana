@@ -257,6 +257,12 @@ public class TextTool: NSObject, DrawingTool {
 			y: -shape.boundingRect.size.height / 2
 			).concatenating(shape.transform.affineTransform)
 		
+		let scaleInverse = 1 / shape.transform.scale
+		
+		editingView.deleteControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
+		editingView.changeWidthControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
+		editingView.resizeAndRotateControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
+		
 		delegate?.textToolDidUpdateEditingViewTransform(editingView, transform: shape.transform)
 		
 		editingView.setNeedsLayout()

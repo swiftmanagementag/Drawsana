@@ -42,17 +42,17 @@ public class TextShapeEditingView: UIView {
     clipsToBounds = false
     backgroundColor = .clear
     layer.isOpaque = false
-
+	textView.layer.borderColor = UIColor.lightGray.cgColor
+	textView.layer.borderWidth = 1.0
+	
     textView.translatesAutoresizingMaskIntoConstraints = false
 
-    deleteControlView.translatesAutoresizingMaskIntoConstraints = false
-    deleteControlView.backgroundColor = .red
-
-    resizeAndRotateControlView.translatesAutoresizingMaskIntoConstraints = false
-    resizeAndRotateControlView.backgroundColor = .green
-
-    changeWidthControlView.translatesAutoresizingMaskIntoConstraints = false
-    changeWidthControlView.backgroundColor = .yellow
+	for v in [deleteControlView, resizeAndRotateControlView, changeWidthControlView] {
+		v.translatesAutoresizingMaskIntoConstraints = false
+		v.backgroundColor = UIColor.lightGray.withAlphaComponent(0.8)
+		v.layer.cornerRadius = 4
+		v.layer.masksToBounds = true
+	}
 
     addSubview(textView)
 
@@ -83,12 +83,13 @@ public class TextShapeEditingView: UIView {
   }
 
   public func addStandardControls() {
+	
     addControl(dragActionType: .delete, view: deleteControlView) { (textView, deleteControlView) in
       NSLayoutConstraint.activate(deprioritize([
         deleteControlView.widthAnchor.constraint(equalToConstant: 36),
         deleteControlView.heightAnchor.constraint(equalToConstant: 36),
-        deleteControlView.rightAnchor.constraint(equalTo: textView.leftAnchor),
-        deleteControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -3),
+        deleteControlView.rightAnchor.constraint(equalTo: textView.leftAnchor, constant: -2),
+        deleteControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -2),
       ]))
     }
 
@@ -96,8 +97,8 @@ public class TextShapeEditingView: UIView {
       NSLayoutConstraint.activate(deprioritize([
         resizeAndRotateControlView.widthAnchor.constraint(equalToConstant: 36),
         resizeAndRotateControlView.heightAnchor.constraint(equalToConstant: 36),
-        resizeAndRotateControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: 5),
-        resizeAndRotateControlView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 4),
+        resizeAndRotateControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: -2),
+        resizeAndRotateControlView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: -2),
       ]))
     }
 
@@ -105,24 +106,26 @@ public class TextShapeEditingView: UIView {
       NSLayoutConstraint.activate(deprioritize([
         changeWidthControlView.widthAnchor.constraint(equalToConstant: 36),
         changeWidthControlView.heightAnchor.constraint(equalToConstant: 36),
-        changeWidthControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: 5),
-        changeWidthControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -4),
+        changeWidthControlView.leftAnchor.constraint(equalTo: textView.rightAnchor, constant: -2),
+        changeWidthControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -2),
       ]))
     }
+	
 	let x = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
-	x.text = "X"
+	x.text = "🗑️"
 	x.textAlignment = .center
 	deleteControlView.addSubview(x)
 	
 	let o = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
-	o.text = "O"
+	o.text = "🌀"
 	o.textAlignment = .center
 	resizeAndRotateControlView.addSubview(o)
 	
-	let h = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
-	h.text = "H"
-	h.textAlignment = .center
-	changeWidthControlView.addSubview(h)
+	let w = UILabel(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 36, height: 36)))
+	w.text = "📏" // ↔️"
+	w.textAlignment = .center
+	changeWidthControlView.addSubview(w)
+	
 
   }
 

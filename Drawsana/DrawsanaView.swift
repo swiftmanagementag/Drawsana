@@ -347,19 +347,15 @@ public class DrawsanaView: UIView {
 		// figure out where the shape is in space
 		if shape is StampShape {
 			//translation = shape.transform.translation + CGPoint(x:  (selectionBounds.size.width / 2.0) + selectionIndicatorInset.x, y: -2 * selectionIndicatorInset.y)
+			
 			selectionIndicatorView.bounds = shape.boundingRect
+			selectionIndicatorView.bounds.origin = .zero
+
+			var translation = shape.transform.translation + CGPoint(x:  selectionIndicatorView.bounds.size.width / 2.0, y: shape.boundingRect.origin.y)
+
+			selectionIndicatorView.transform = shape.transform.affineTransform
+			selectionIndicatorView.isHidden = true
 			
-			// Fudge factor to make shape and text view line up exactly
-			//selectionIndicatorView.bounds.size.width += 3
-			//selectionIndicatorView.transform = shape.transform.affineTransform
-			
-			selectionIndicatorView.transform = shape.transform.affineTransform.concatenating(CGAffineTransform(
-				translationX: shape.boundingRect.size.width / 2,
-				y: shape.boundingRect.size.height / 2
-				))
-			
-			selectionIndicatorView.setNeedsLayout()
-			selectionIndicatorView.layoutIfNeeded()
 		} else {
 			// Warning: hand-wavy math ahead
 			
@@ -376,23 +372,17 @@ public class DrawsanaView: UIView {
 			selectionBounds.origin = .zero
 			selectionIndicatorView.bounds = selectionBounds
 			
-			/*
-			let translation2 = (offset + shape.transform.translation +
-				// Account for the coordinate system being anchored in the middle
-				CGPoint(x: -bounds.size.width / 2, y: -bounds.size.height / 2) +
-				// We've just moved the CENTER of the selection view to the UPPER LEFT
-				// of the shape, so adjust by half the selection size:
-				CGPoint(x: selectionBounds.size.width / 2, y: selectionBounds.size.height / 2))
-			*/
 			selectionIndicatorView.transform = ShapeTransform(
 				translation: translation,
 				rotation: shape.transform.rotation,
 				scale: shape.transform.scale).affineTransform
+			
+			selectionIndicatorView.isHidden = true
+			
+			selectionIndicatorViewShapeLayer.frame = selectionIndicatorView.bounds
+			selectionIndicatorViewShapeLayer.path = UIBezierPath(rect: selectionIndicatorView.bounds).cgPath
 		}
-		selectionIndicatorView.isHidden = false
 		
-		selectionIndicatorViewShapeLayer.frame = selectionIndicatorView.bounds
-		selectionIndicatorViewShapeLayer.path = UIBezierPath(rect: selectionIndicatorView.bounds).cgPath
 	}
 	
 	private func redrawAbsolutelyEverything() {

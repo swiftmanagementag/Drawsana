@@ -32,6 +32,8 @@ public protocol StampToolDelegate: AnyObject {
 	/// the Stamp, you'll need to do some math and apply some inverse scaling
 	/// transforms here.
 	func stampToolDidUpdateEditingViewTransform(_ editingView: StampShapeEditingView, transform: ShapeTransform)
+	
+	func stampToolChangeImage()
 }
 
 public class StampTool: NSObject, DrawingTool {
@@ -46,7 +48,8 @@ public class StampTool: NSObject, DrawingTool {
 	/// events happen that you might want to react to. The core framework does
 	/// not use this delegate.
 	public weak var delegate: StampToolDelegate?
-	private var imageName: String = ""
+	
+	private var imageName: String = "" 
 	private var originalImageName: String = ""
 	
 	// MARK: Internal state
@@ -92,6 +95,8 @@ public class StampTool: NSObject, DrawingTool {
 		if let dragActionType = editingView.getDragActionType(point: point), case .delete = dragActionType {
 			applyRemoveShapeOperation(context: context)
 			delegate?.stampToolDidTapAway(tappedPoint: point)
+		} else if let dragActionType = editingView.getDragActionType(point: point), case .changeImage = dragActionType {
+			delegate?.stampToolChangeImage()
 		} else if shape.hitTest(point: point) {
 			// TODO: Forward tap to editingView.textView somehow, or manually set
 			// the cursor point
@@ -171,12 +176,16 @@ public class StampTool: NSObject, DrawingTool {
 	
 	public func apply(context: ToolOperationContext, userSettings: UserSettings) {
 		selectedShape?.apply(userSettings: userSettings)
+		
+		updateShapeFrame()
 		updateImageView()
 		if context.toolSettings.selectedShape == nil {
 			selectedShape = nil
 			context.toolSettings.interactiveView = nil
 		}
 		context.toolSettings.isPersistentBufferDirty = true
+		
+		
 	}
 	
 	// MARK: Helpers: begin/end editing actions
@@ -184,6 +193,8 @@ public class StampTool: NSObject, DrawingTool {
 	private func beginEditing(shape: StampShape, context: ToolOperationContext) {
 		// Remember values
 		originalImageName = shape.imageName
+		
+		context.userSettings.imageName = shape.imageName
 		
 		// Configure and re-render shape for editing
 		shape.isBeingEdited = true // stop rendering this shape while textView is open
@@ -234,8 +245,6 @@ public class StampTool: NSObject, DrawingTool {
 		
 		shape.boundingRect = computeBounds()
 		
-		// Shape jumps a little after editing unless we add this fudge factor
-		shape.boundingRect.origin.x += 2
 		updateImageView()
 	}
 	func computeBounds() -> CGRect {
@@ -269,6 +278,11 @@ public class StampTool: NSObject, DrawingTool {
 			translationX: shape.boundingRect.size.width / 2,
 			y: shape.boundingRect.size.height / 2
 			).concatenating(shape.transform.affineTransform)
+		
+		let scaleInverse = 1 / shape.transform.scale
+		editingView.deleteControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
+		editingView.changeImageControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
+		editingView.resizeAndRotateControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
 		
 		editingView.setNeedsLayout()
 		editingView.layoutIfNeeded()
