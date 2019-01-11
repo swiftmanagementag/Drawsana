@@ -14,18 +14,18 @@ public protocol TextToolDelegate: AnyObject {
 	/// shape should be created. You might want to set it to a specific point, or
 	/// make sure it's above the keyboard.
 	func textToolPointForNewText(tappedPoint: CGPoint) -> CGPoint
-	
+
 	/// User tapped away from the active text shape. If you give users access to
 	/// the selection tool, you might want to set it as the active tool at this
 	/// point.
 	func textToolDidTapAway(tappedPoint: CGPoint)
-	
+
 	/// The text tool is about to present a text editing view. You may configure
 	/// it however you like. If you're just starting out, you probably want to
 	/// call `editingView.addStandardControls()` to add the delete button and the
 	/// two resize handles.
 	func textToolWillUseEditingView(_ editingView: TextShapeEditingView)
-	
+
 	/// The user has changed the transform of the selected shape. You may leave
 	/// this method empty, but unless you want your text controls to scale with
 	/// the text, you'll need to do some math and apply some inverse scaling
@@ -35,19 +35,19 @@ public protocol TextToolDelegate: AnyObject {
 
 public class TextTool: NSObject, DrawingTool {
 	/// MARK: Protocol requirements
-	
+
 	public let isProgressive = false
 	public let name: String = "Text"
-	
+
 	// MARK: Public properties
-	
+
 	/// You may set yourself as the delegate to be notified when special selection
 	/// events happen that you might want to react to. The core framework does
 	/// not use this delegate.
 	public weak var delegate: TextToolDelegate?
-	
+
 	// MARK: Internal state
-	
+
 	/// The text tool has 3 different behaviors on drag depending on where your
 	/// touch starts. See `DragHandler.swift` for their implementations.
 	private var dragHandler: DragHandler?
@@ -57,30 +57,29 @@ public class TextTool: NSObject, DrawingTool {
 	private weak var shapeUpdater: DrawsanaViewShapeUpdating?
 	// internal for use by DragHandler subclasses
 	internal lazy var editingView: TextShapeEditingView = makeTextView()
-	
+
 	public init(delegate: TextToolDelegate? = nil) {
 		super.init()
 		self.delegate = delegate
 	}
-	
+
 	// MARK: Tool lifecycle
-	
+
 	public func activate(shapeUpdater: DrawsanaViewShapeUpdating, context: ToolOperationContext, shape: Shape?) {
 		self.shapeUpdater = shapeUpdater
 		if let shape = shape as? TextShape {
 			beginEditing(shape: shape, context: context)
 		}
 	}
-	
+
 	public func deactivate(context: ToolOperationContext) {
 		context.toolSettings.interactiveView?.resignFirstResponder()
 		context.toolSettings.interactiveView = nil
 		context.toolSettings.selectedShape = nil
 		finishEditing(context: context)
 		selectedShape = nil
-		
 	}
-	
+
 	public func handleTap(context: ToolOperationContext, point: CGPoint) {
 		if let shapeInProgress = self.selectedShape {
 			handleTapWhenShapeIsActive(context: context, point: point, shape: shapeInProgress)
@@ -88,7 +87,7 @@ public class TextTool: NSObject, DrawingTool {
 			handleTapWhenNoShapeIsActive(context: context, point: point)
 		}
 	}
-	
+
 	private func handleTapWhenShapeIsActive(context: ToolOperationContext, point: CGPoint, shape: TextShape) {
 		if let dragActionType = editingView.getDragActionType(point: point), case .delete = dragActionType {
 			applyRemoveShapeOperation(context: context)
@@ -100,14 +99,12 @@ public class TextTool: NSObject, DrawingTool {
 			finishEditing(context: context)
 			selectedShape = nil
 			context.toolSettings.selectedShape = nil
-			
 			delegate?.textToolDidTapAway(tappedPoint: point)
 			shapeUpdater?.rerenderAllShapesInefficiently()
-			
 		}
 		return
 	}
-	
+
 	private func handleTapWhenNoShapeIsActive(context: ToolOperationContext, point: CGPoint) {
 		if let tappedShape = context.drawing.getShape(of: TextShape.self, at: point) {
 			beginEditing(shape: tappedShape, context: context)
@@ -121,7 +118,7 @@ public class TextTool: NSObject, DrawingTool {
 			context.operationStack.apply(operation: AddShapeOperation(shape: newShape))
 		}
 	}
-	
+
 	public func handleDragStart(context: ToolOperationContext, point: CGPoint) {
 		guard let shape = selectedShape else { return }
 		if let dragActionType = editingView.getDragActionType(point: point), case .resizeAndRotate = dragActionType {
@@ -133,13 +130,13 @@ public class TextTool: NSObject, DrawingTool {
 		} else {
 			dragHandler = nil
 		}
-		
+
 		if let dragHandler = dragHandler {
 			applyEditTextOperationIfTextHasChanged(context: context)
 			dragHandler.handleDragStart(context: context, point: point)
 		}
 	}
-	
+
 	public func handleDragContinue(context: ToolOperationContext, point: CGPoint, velocity: CGPoint) {
 		if let dragHandler = dragHandler {
 			dragHandler.handleDragContinue(context: context, point: point, velocity: velocity)
@@ -153,7 +150,7 @@ public class TextTool: NSObject, DrawingTool {
 			}
 		}
 	}
-	
+
 	public func handleDragEnd(context: ToolOperationContext, point: CGPoint) {
 		if let dragHandler = dragHandler {
 			dragHandler.handleDragEnd(context: context, point: point)
@@ -162,14 +159,14 @@ public class TextTool: NSObject, DrawingTool {
 		context.toolSettings.isPersistentBufferDirty = true
 		updateTextView()
 	}
-	
+
 	public func handleDragCancel(context: ToolOperationContext, point: CGPoint) {
 		if let dragHandler = dragHandler {
 			dragHandler.handleDragCancel(context: context, point: point)
 			self.dragHandler = nil
 		}
 	}
-	
+
 	public func apply(context: ToolOperationContext, userSettings: UserSettings) {
 		selectedShape?.apply(userSettings: userSettings)
 		updateTextView()
@@ -179,29 +176,29 @@ public class TextTool: NSObject, DrawingTool {
 		}
 		context.toolSettings.isPersistentBufferDirty = true
 	}
-	
+
 	// MARK: Helpers: begin/end editing actions
-	
+
 	private func beginEditing(shape: TextShape, context: ToolOperationContext) {
 		// Remember values
 		originalText = shape.text
 		maxWidth = max(maxWidth, context.drawing.size.width)
-		
+
 		// Configure and re-render shape for editing
 		shape.isBeingEdited = true // stop rendering this shape while textView is open
 		shapeUpdater?.rerenderAllShapesInefficiently()
-		
+
 		// Set selection in an order that guarantees the *initial* selection rect
 		// is correct
 		selectedShape = shape
 		updateShapeFrame()
 		context.toolSettings.selectedShape = shape
-		
+
 		// Prepare interactive editing view
 		context.toolSettings.interactiveView = editingView
 		editingView.becomeFirstResponder()
 	}
-	
+
 	/// If shape text has changed, notify operation stack so that undo works
 	/// properly
 	private func finishEditing(context: ToolOperationContext) {
@@ -210,10 +207,9 @@ public class TextTool: NSObject, DrawingTool {
 		updateShapeFrame()
 		context.toolSettings.interactiveView = nil
 		context.toolSettings.selectedShape = nil
-		
 		context.toolSettings.isPersistentBufferDirty = true
 	}
-	
+
 	private func applyEditTextOperationIfTextHasChanged(context: ToolOperationContext) {
 		guard let shape = selectedShape, originalText != shape.text else { return }
 		context.operationStack.apply(operation: EditTextOperation(
@@ -222,7 +218,7 @@ public class TextTool: NSObject, DrawingTool {
 			text: shape.text))
 		originalText = shape.text
 	}
-	
+
 	private func applyRemoveShapeOperation(context: ToolOperationContext) {
 		guard let shape = selectedShape else { return }
 		editingView.resignFirstResponder()
@@ -233,9 +229,9 @@ public class TextTool: NSObject, DrawingTool {
 		context.toolSettings.isPersistentBufferDirty = true
 		context.toolSettings.interactiveView = nil
 	}
-	
+
 	// MARK: Other helpers
-	
+
 	func updateShapeFrame() {
 		guard let shape = selectedShape else { return }
 		shape.boundingRect = computeBounds()
@@ -243,7 +239,7 @@ public class TextTool: NSObject, DrawingTool {
 		shape.boundingRect.origin.x += 2
 		updateTextView()
 	}
-	
+
 	func updateTextView() {
 		guard let shape = selectedShape else { return }
 		editingView.textView.text = shape.text
@@ -256,23 +252,20 @@ public class TextTool: NSObject, DrawingTool {
 			translationX: -shape.boundingRect.size.width / 2,
 			y: -shape.boundingRect.size.height / 2
 			).concatenating(shape.transform.affineTransform)
-		
 		let scaleInverse = 1 / shape.transform.scale
-		
 		editingView.deleteControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
 		editingView.changeWidthControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
 		editingView.resizeAndRotateControlView.transform = CGAffineTransform(scaleX: scaleInverse, y: scaleInverse)
-		
 		delegate?.textToolDidUpdateEditingViewTransform(editingView, transform: shape.transform)
-		
+
 		editingView.setNeedsLayout()
 		editingView.layoutIfNeeded()
 	}
-	
+
 	func computeBounds() -> CGRect {
 		guard let shape = selectedShape else { return .zero }
 		updateTextView()
-		
+
 		// Compute rect naively
 		var textSize = editingView.sizeThatFits(CGSize(width: shape.explicitWidth ?? maxWidth, height: .infinity))
 		if let explicitWidth = shape.explicitWidth {
@@ -281,38 +274,38 @@ public class TextTool: NSObject, DrawingTool {
 		textSize.width = max(textSize.width, 44)
 		let origin = CGPoint(x: -textSize.width / 2, y: -textSize.height / 2)
 		var rect = CGRect(origin: origin, size: textSize)
-		
+
 		// If user has explicitly dragged the text width handle, respect their
 		// decision and don't try to automatically adjust width
 		if shape.explicitWidth != nil {
 			return rect
 		}
-		
+
 		// Compute rect final position (ignore scale and rotation as a shortcut)
 		var transformedRect = rect.applying(CGAffineTransform(translationX: shape.transform.translation.x, y: shape.transform.translation.y))
-		
+
 		// TODO: These calculations are ultimately inaccurate and need to be
 		//       revisited.
-		
+
 		// Move rect to the right if it's too far left
 		if transformedRect.origin.x < 0 {
 			rect.size.width += transformedRect.origin.x
 			rect.origin.x -= transformedRect.origin.x
 		}
-		
+
 		// Shrink rect if it's too far right
 		transformedRect = rect.applying(CGAffineTransform(translationX: shape.transform.translation.x, y: shape.transform.translation.y))
 		let widthOverrun = transformedRect.origin.x + transformedRect.size.width - maxWidth
 		if widthOverrun > 0 {
 			rect.size.width -= widthOverrun
 		}
-		
+
 		var finalSize = editingView.sizeThatFits(CGSize(width: rect.size.width, height: .infinity))
 		finalSize.width = max(finalSize.width, 44)
 		let finalOrigin = CGPoint(x: -finalSize.width / 2, y: -finalSize.height / 2)
 		return CGRect(origin: finalOrigin, size: finalSize)
 	}
-	
+
 	private func makeTextView() -> TextShapeEditingView {
 		let textView = UITextView()
 		textView.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin]
@@ -341,11 +334,11 @@ extension TextTool: UITextViewDelegate {
 		// TODO: Only update selection rect here instead of rerendering everything
 		shapeUpdater?.rerenderAllShapesInefficiently()
 	}
-	
+
 	public func textViewDidBeginEditing(_ textView: UITextView) {
 		selectedShape?.isBeingEdited = true
 	}
-	
+
 	public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
 		selectedShape?.isBeingEdited = false
 		return true

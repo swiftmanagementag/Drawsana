@@ -95,7 +95,10 @@ public class Drawing: Codable {
     multiDecoder.tryDecoding(PenShape.self)
     multiDecoder.tryDecoding(RectShape.self)
     multiDecoder.tryDecoding(TextShape.self)
-	multiDecoder.tryDecoding(StampShape.self)
+    multiDecoder.tryDecoding(StarShape.self)
+    multiDecoder.tryDecoding(NgonShape.self)
+
+    multiDecoder.tryDecoding(StampShape.self)
     shapeDecoder?(multiDecoder)
     container = multiDecoder.container
     return multiDecoder.results
