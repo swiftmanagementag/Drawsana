@@ -293,6 +293,15 @@ public class DrawsanaView: UIView {
 				tool.handleDragEnd(context: toolOperationContext, point: point)
 				delegate?.drawsanaView(self, didEndDragWith: tool)
 			} else {
+				//if let tappedShape = drawing.getShape(at: point) {
+				//	// Swap tool
+				//	if tappedShape is StampShape {
+				//		self.set(tool: t)
+				//	} else if tappedShape is TextShape {
+				//		self.set(tool: TextTool())
+				//	}
+				//}
+						
 				tool.handleDragCancel(context: toolOperationContext, point: point)
 				tool.handleTap(context: toolOperationContext, point: point)
 			}
