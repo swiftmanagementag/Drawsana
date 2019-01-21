@@ -310,7 +310,8 @@ public class DrawsanaView: UIView {
 			tool.handleDragCancel(context: toolOperationContext, point: point)
 			reapplyLayerContents()
 		default:
-			assert(false, "State not handled")
+			//assert(false, "State not handled")
+			print("State not handled \(sender.state)")
     }
 
 		applyToolSettingsChanges()
@@ -392,8 +393,26 @@ public class DrawsanaView: UIView {
 	}
 	private func redrawAbsolutelyEverything() {
 		persistentBuffer = DrawsanaUtilities.renderImage(size: drawing.size) {
+			var factor:CGFloat = 1.0
+			var offset:CGFloat = 0
+			
+			if (drawing.sizeSource.width > 0 && drawing.sizeSource.height > 0) && drawing.size != drawing.sizeSource {
+				factor = (drawing.size.width / drawing.sizeSource.width)
+				offset = (drawing.size.height - drawing.sizeSource.height)
+				offset = ((drawing.size.width * (drawing.sizeSource.height / drawing.sizeSource.width) - drawing.size.height)) / 2
+				print("resizing necessary by factor \(factor) offset \(offset)")
+			}
+			
 			for shape in self.drawing.shapes {
+				if factor != 1.0 {
+					
+					shape.resize(by: factor, offset: offset)
+				}
 				shape.render(in: $0)
+			}
+			if factor != 1.0  {
+				// make sure scaling is only done ones
+				drawing.sizeSource = drawing.size
 			}
 		}
 		reapplyLayerContents()

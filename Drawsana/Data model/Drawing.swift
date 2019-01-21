@@ -24,6 +24,7 @@ public class Drawing: Codable {
   weak var delegate: DrawingDelegate?
 
   public var size: CGSize
+  public var sizeSource: CGSize = CGSize.zero
   public private(set) var shapes: [Shape] = []
 
   /**
@@ -59,7 +60,8 @@ public class Drawing: Codable {
 
     // Size is straightforward:
     size = try container.decode(CGSize.self, forKey: .size)
-
+	sizeSource = size
+	
     // For shapes, create an iterator for the container and make the destination
     // array (self.shapes) initially empty
     shapes = []

@@ -25,7 +25,9 @@ public protocol Shape: AnyObject, Codable {
   /// Draw this shape to the given Core Graphics context. Transforms for drawing
   /// position and scale are already applied.
   func render(in context: CGContext)
-
+  func resize(by factor:CGFloat, offset:CGFloat)
+	
+	
   /// Return true iff the given point meaningfully intersects with the pixels
   /// drawn by this shape. See `ShapeWithBoundingRect` for a shortcut.
   func hitTest(point: CGPoint) -> Bool

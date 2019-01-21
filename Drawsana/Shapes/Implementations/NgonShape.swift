@@ -89,7 +89,20 @@ public class NgonShape:
         try container.encodeIfPresent(dashPhase, forKey: .dashPhase)
         try container.encodeIfPresent(dashLengths, forKey: .dashLengths)
     }
-    
+	public func resize(by factor:CGFloat, offset:CGFloat) {
+		// this would need to be verified as we do not yet use this tool
+		a.x = a.x * factor
+		a.y = a.y * factor - offset
+		
+		b.x = b.x * factor
+		b.y = b.y * factor - offset
+		
+		transform.scale = transform.scale * factor
+		transform.translation.x = transform.translation.x * factor
+		transform.translation.y = transform.translation.y * factor - offset
+
+	}
+	
     public func render(in context: CGContext) {
         transform.begin(context: context)
         

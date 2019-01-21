@@ -68,6 +68,12 @@ public class StampShape: Shape, ShapeSelectable {
 		}
 		transform.end(context: context)
 	}
+	public func resize(by factor:CGFloat, offset:CGFloat) {
+		transform.scale = transform.scale * factor
+		transform.translation.x = transform.translation.x * factor
+		transform.translation.y = transform.translation.y * factor - offset
+	}
+	
 	public func apply(userSettings: UserSettings) {
 		imageName = userSettings.imageName
 	}

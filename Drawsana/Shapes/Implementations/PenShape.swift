@@ -73,7 +73,26 @@ public class PenShape: Shape, ShapeWithStrokeState {
   public func add(segment: PenLineSegment) {
     segments.append(segment)
   }
-
+	public func resize(by factor:CGFloat, offset:CGFloat) {
+		// print("before a: \(a), b: \(b)")
+		start.x = start.x * factor
+		start.y = start.y * factor - offset
+		
+		var newSegments = [PenLineSegment]()
+		for s in segments {
+			var sNew = s
+			sNew.a.x = sNew.a.x * factor
+			sNew.a.y = sNew.a.y * factor - offset
+			
+			sNew.b.x = sNew.b.x * factor
+			sNew.b.y = sNew.b.y * factor - offset
+			
+			newSegments.append(sNew)
+		}
+		
+		segments = newSegments
+	}
+	
   private func render(in context: CGContext, onlyLast: Bool = false) {
     context.saveGState()
     if isEraser {

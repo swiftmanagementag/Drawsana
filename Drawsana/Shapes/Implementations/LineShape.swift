@@ -86,7 +86,14 @@ public class LineShape:
     try container.encodeIfPresent(dashPhase, forKey: .dashPhase)
     try container.encodeIfPresent(dashLengths, forKey: .dashLengths)
   }
-
+	public func resize(by factor:CGFloat, offset:CGFloat) {
+		a.x = a.x * factor
+		a.y = a.y * factor - offset
+		
+		b.x = b.x * factor
+		b.y = b.y * factor - offset
+	}
+	
   public func render(in context: CGContext) {
     transform.begin(context: context)
     context.setLineCap(capStyle)
