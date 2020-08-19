@@ -13,67 +13,72 @@ import CoreGraphics
  shapes.
  */
 public class UserSettings {
-	weak var delegate: UserSettingsDelegate?
+    weak var delegate: UserSettingsDelegate?
 
-	public var strokeColor: UIColor? {
-		didSet {
-			guard strokeColor != oldValue else { return }
-			delegate?.userSettings(self, didChangeStrokeColor: strokeColor)
-		}
-	}
-	public var fillColor: UIColor? {
-		didSet {
-			guard fillColor != oldValue else { return }
-			delegate?.userSettings(self, didChangeFillColor: fillColor)
-		}
-	}
-	public var strokeWidth: CGFloat {
-		didSet {
-			guard strokeWidth != oldValue else { return }
-			delegate?.userSettings(self, didChangeStrokeWidth: strokeWidth)
-		}
-	}
-	public var fontName: String {
-		didSet {
-			guard fontName != oldValue else { return }
-			delegate?.userSettings(self, didChangeFontName: fontName)
-		}
-	}
-	public var fontSize: CGFloat {
-		didSet {
-			guard fontSize != oldValue else { return }
-			delegate?.userSettings(self, didChangeFontSize: fontSize)
-		}
-	}
-	public var imageName: String {
-		didSet {
-			guard imageName != oldValue else { return }
-			delegate?.userSettings(self, didChangeImageName: imageName)
-		}
-	}
-	
-	init(
-		strokeColor: UIColor?,
-		fillColor: UIColor?,
-		strokeWidth: CGFloat,
-		fontName: String,
-		fontSize: CGFloat,
-		imageName: String)
-	{
-		self.strokeColor = strokeColor
-		self.fillColor = fillColor
-		self.strokeWidth = strokeWidth
-		self.fontName = fontName
-		self.fontSize = fontSize
-		self.imageName = imageName
-	}
+    public var strokeColor: UIColor? {
+        didSet {
+            guard strokeColor != oldValue else { return }
+            delegate?.userSettings(self, didChangeStrokeColor: strokeColor)
+        }
+    }
+
+    public var fillColor: UIColor? {
+        didSet {
+            guard fillColor != oldValue else { return }
+            delegate?.userSettings(self, didChangeFillColor: fillColor)
+        }
+    }
+
+    public var strokeWidth: CGFloat {
+        didSet {
+            guard strokeWidth != oldValue else { return }
+            delegate?.userSettings(self, didChangeStrokeWidth: strokeWidth)
+        }
+    }
+
+    public var fontName: String {
+        didSet {
+            guard fontName != oldValue else { return }
+            delegate?.userSettings(self, didChangeFontName: fontName)
+        }
+    }
+
+    public var fontSize: CGFloat {
+        didSet {
+            guard fontSize != oldValue else { return }
+            delegate?.userSettings(self, didChangeFontSize: fontSize)
+        }
+    }
+
+    public var imageName: String {
+        didSet {
+            guard imageName != oldValue else { return }
+            delegate?.userSettings(self, didChangeImageName: imageName)
+        }
+    }
+
+    init(
+        strokeColor: UIColor?,
+        fillColor: UIColor?,
+        strokeWidth: CGFloat,
+        fontName: String,
+        fontSize: CGFloat,
+        imageName: String
+    ) {
+        self.strokeColor = strokeColor
+        self.fillColor = fillColor
+        self.strokeWidth = strokeWidth
+        self.fontName = fontName
+        self.fontSize = fontSize
+        self.imageName = imageName
+    }
 }
 
 protocol UserSettingsDelegate: AnyObject {
-	func userSettings(_ userSettings: UserSettings, didChangeStrokeColor strokeColor: UIColor?)
-	func userSettings(_ userSettings: UserSettings, didChangeFillColor fillColor: UIColor?)
-	func userSettings(_ userSettings: UserSettings, didChangeStrokeWidth strokeWidth: CGFloat)
-	func userSettings(_ userSettings: UserSettings, didChangeFontName fontName: String)
-	func userSettings(_ userSettings: UserSettings, didChangeFontSize fontSize: CGFloat)
-	func userSettings(_ userSettings: UserSettings, didChangeImageName imageName: String)
+    func userSettings(_ userSettings: UserSettings, didChangeStrokeColor strokeColor: UIColor?)
+    func userSettings(_ userSettings: UserSettings, didChangeFillColor fillColor: UIColor?)
+    func userSettings(_ userSettings: UserSettings, didChangeStrokeWidth strokeWidth: CGFloat)
+    func userSettings(_ userSettings: UserSettings, didChangeFontName fontName: String)
+    func userSettings(_ userSettings: UserSettings, didChangeFontSize fontSize: CGFloat)
+    func userSettings(_ userSettings: UserSettings, didChangeImageName imageName: String)
 }

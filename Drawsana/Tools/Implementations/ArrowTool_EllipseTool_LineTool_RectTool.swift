@@ -9,25 +9,25 @@
 import CoreGraphics
 
 public class LineTool: DrawingToolForShapeWithTwoPoints {
-  public override var name: String { return "Line" }
-  public override func makeShape() -> ShapeType { return LineShape() }
+    override public var name: String { return "Line" }
+    override public func makeShape() -> ShapeType { return LineShape() }
 }
 
 public class ArrowTool: DrawingToolForShapeWithTwoPoints {
-  public override var name: String { return "Arrow" }
-  public override func makeShape() -> ShapeType {
-    let shape = LineShape()
-    shape.arrowStyle = .standard
-    return shape
-  }
+    override public var name: String { return "Arrow" }
+    override public func makeShape() -> ShapeType {
+        let shape = LineShape()
+        shape.arrowStyle = .standard
+        return shape
+    }
 }
 
 public class RectTool: DrawingToolForShapeWithTwoPoints {
-  public override var name: String { return "Rectangle" }
-  public override func makeShape() -> ShapeType { return RectShape() }
+    override public var name: String { return "Rectangle" }
+    override public func makeShape() -> ShapeType { return RectShape() }
 }
 
 public class EllipseTool: DrawingToolForShapeWithTwoPoints {
-  public override var name: String { return "Ellipse" }
-  public override func makeShape() -> ShapeType { return EllipseShape() }
+    override public var name: String { return "Ellipse" }
+    override public func makeShape() -> ShapeType { return EllipseShape() }
 }

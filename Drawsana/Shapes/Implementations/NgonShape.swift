@@ -16,11 +16,11 @@ public class NgonShape:
 {
     private enum CodingKeys: String, CodingKey {
         case id, a, b, strokeColor, fillColor, strokeWidth, capStyle, joinStyle,
-        dashPhase, dashLengths, transform, type, sides
+            dashPhase, dashLengths, transform, type, sides
     }
-    
+
     public static let type: String = "Ngon"
-    
+
     public var id: String = UUID().uuidString
     public var a: CGPoint = .zero
     public var b: CGPoint = .zero
@@ -37,35 +37,35 @@ public class NgonShape:
     public var boundingRect: CGRect {
         return squareRect
     }
-    
+
     public init(_ sides: Int) {
         self.sides = sides
     }
-    
+
     public required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         let type = try values.decode(String.self, forKey: .type)
         if type != NgonShape.type {
             throw DrawsanaDecodingError.wrongShapeTypeError
         }
-        
+
         id = try values.decode(String.self, forKey: .id)
         a = try values.decode(CGPoint.self, forKey: .a)
         b = try values.decode(CGPoint.self, forKey: .b)
-        
+
         strokeColor = try values.decodeColorIfPresent(forKey: .strokeColor)
         fillColor = try values.decodeColorIfPresent(forKey: .fillColor)
-        
+
         strokeWidth = try values.decode(CGFloat.self, forKey: .strokeWidth)
         transform = try values.decodeIfPresent(ShapeTransform.self, forKey: .transform) ?? .identity
-        
+
         capStyle = CGLineCap(rawValue: try values.decodeIfPresent(Int32.self, forKey: .capStyle) ?? CGLineCap.round.rawValue)!
         joinStyle = CGLineJoin(rawValue: try values.decodeIfPresent(Int32.self, forKey: .joinStyle) ?? CGLineJoin.round.rawValue)!
         dashPhase = try values.decodeIfPresent(CGFloat.self, forKey: .dashPhase)
         dashLengths = try values.decodeIfPresent([CGFloat].self, forKey: .dashLengths)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(NgonShape.type, forKey: .type)
@@ -75,11 +75,11 @@ public class NgonShape:
         try container.encode(strokeColor?.hexString, forKey: .strokeColor)
         try container.encode(fillColor?.hexString, forKey: .fillColor)
         try container.encode(strokeWidth, forKey: .strokeWidth)
-        
+
         if !transform.isIdentity {
             try container.encode(transform, forKey: .transform)
         }
-        
+
         if capStyle != .round {
             try container.encode(capStyle.rawValue, forKey: .capStyle)
         }
@@ -89,33 +89,33 @@ public class NgonShape:
         try container.encodeIfPresent(dashPhase, forKey: .dashPhase)
         try container.encodeIfPresent(dashLengths, forKey: .dashLengths)
     }
-	public func resize(by factor:CGFloat, offset:CGFloat) {
-		// this would need to be verified as we do not yet use this tool
-		a.x = a.x * factor
-		a.y = a.y * factor - offset
-		
-		b.x = b.x * factor
-		b.y = b.y * factor - offset
-		
-		transform.scale = transform.scale * factor
-		transform.translation.x = transform.translation.x * factor
-		transform.translation.y = transform.translation.y * factor - offset
 
-	}
-	
+    public func resize(by factor: CGFloat, offset: CGFloat) {
+        // this would need to be verified as we do not yet use this tool
+        a.x = a.x * factor
+        a.y = a.y * factor - offset
+
+        b.x = b.x * factor
+        b.y = b.y * factor - offset
+
+        transform.scale = transform.scale * factor
+        transform.translation.x = transform.translation.x * factor
+        transform.translation.y = transform.translation.y * factor - offset
+    }
+
     public func render(in context: CGContext) {
         transform.begin(context: context)
-        
+
         if let fillColor = fillColor {
             context.setFillColor(fillColor.cgColor)
-            context.addPath(polygonPath(x: squareRect.midX, y: squareRect.midY, radius: (squareRect.width - strokeWidth)/2, sides: sides, offset:90))   //Pentagon
+            context.addPath(polygonPath(x: squareRect.midX, y: squareRect.midY, radius: (squareRect.width - strokeWidth) / 2, sides: sides, offset: 90)) // Pentagon
             context.fillPath()
         }
-        
+
         context.setLineCap(capStyle)
         context.setLineJoin(joinStyle)
         context.setLineWidth(strokeWidth)
-        
+
         if let strokeColor = strokeColor {
             context.setStrokeColor(strokeColor.cgColor)
             if let dashPhase = dashPhase, let dashLengths = dashLengths {
@@ -123,18 +123,17 @@ public class NgonShape:
             } else {
                 context.setLineDash(phase: 0, lengths: [])
             }
-            
-            context.addPath(polygonPath(x: squareRect.midX, y: squareRect.midY, radius: (squareRect.width - strokeWidth)/2, sides: sides, offset:90))   //Pentagon
+
+            context.addPath(polygonPath(x: squareRect.midX, y: squareRect.midY, radius: (squareRect.width - strokeWidth) / 2, sides: sides, offset: 90)) // Pentagon
 
             context.strokePath()
         }
-        
+
         transform.end(context: context)
     }
-    
 
-    func polygonPointArray(sides:Int,x:CGFloat,y:CGFloat,radius:CGFloat,offset:CGFloat)->[CGPoint] {
-        let angle = (360/CGFloat(sides)).radians
+    func polygonPointArray(sides: Int, x: CGFloat, y: CGFloat, radius: CGFloat, offset: CGFloat) -> [CGPoint] {
+        let angle = (360 / CGFloat(sides)).radians
         let cx = x // x origin
         let cy = y // y origin
         let r = radius // radius of circle
@@ -148,10 +147,10 @@ public class NgonShape:
         }
         return points
     }
-    
-    func polygonPath(x:CGFloat, y:CGFloat, radius:CGFloat, sides:Int, offset: CGFloat) -> CGPath {
+
+    func polygonPath(x: CGFloat, y: CGFloat, radius: CGFloat, sides: Int, offset: CGFloat) -> CGPath {
         let path = CGMutablePath()
-        let points = polygonPointArray(sides: sides,x: x,y: y,radius: radius, offset: offset)
+        let points = polygonPointArray(sides: sides, x: x, y: y, radius: radius, offset: offset)
         let cpg = points[0]
         path.move(to: cpg)
         for p in points {
@@ -161,4 +160,3 @@ public class NgonShape:
         return path
     }
 }
-
